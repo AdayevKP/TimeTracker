@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Kirill Adayev"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.109.0"
+pytest = "^8.0.0"
+uvicorn = "^0.22.0"
+
+
+[build-system]
+requires = ["poetry-core=^1.7.1"]
+build-backend = "poetry.core.masonry.api"
