@@ -1,31 +1,41 @@
 import fastapi as fa
-import typing as tp
 
-from app.api import models
-
+from app import models
+from app.api import context as ctx
 
 router = fa.APIRouter(
     prefix="/projects",
     tags=["projects"],
-    responses={404: {"description": "Not found"}},
 )
 
 
-@router.post('/')
-async def add_project(project: models.Project):
-    return {'id': 1, **project.dict()}
+@router.post('/', status_code=fa.status.HTTP_201_CREATED)
+async def add_project(project: models.Project, context: ctx.ApiContextDep) -> models.SavedProject:
+    return await context.proj_storage.save_project(project)
 
 
-@router.get('/')
-async def get_projects_list(offset: int = 0, limit: tp.Annotated[int, fa.Query(le=100)] = 20):
-    return [{'id': 1}, {'id': 2}]
+@router.get('/', status_code=fa.status.HTTP_200_OK)
+async def get_projects_list(context: ctx.ApiContextDep) -> list[models.SavedProject]:
+    return await context.proj_storage.get_all_projects()
 
 
-@router.get('/{project_id}')
-async def get_project(project_id: int):
-    return {'id': project_id}
+@router.get('/{project_id}', status_code=fa.status.HTTP_200_OK)
+async def get_project(project_id: int, context: ctx.ApiContextDep) -> models.SavedProject:
+    proj = await context.proj_storage.get_project(project_id)
+
+    if proj is None:
+        raise fa.HTTPException(status_code=404, detail=f"Project {project_id} not found")
+
+    return proj
 
 
-@router.put('/{project_id}')
-async def update_project(project_id: int, project: models.Project):
-    return {'id': project_id, **project.dict()}
+@router.put('/{project_id}', status_code=fa.status.HTTP_200_OK)
+async def update_project(
+        project_id: int, project: models.Project, context: ctx.ApiContextDep
+) -> models.SavedProject:
+    proj = await context.proj_storage.update_project(project_id, project)
+
+    if proj is None:
+        raise fa.HTTPException(status_code=404, detail=f"Project {project_id} not found")
+
+    return proj

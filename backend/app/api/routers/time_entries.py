@@ -1,8 +1,7 @@
 import fastapi as fa
 import typing as tp
 
-from app.api import models
-
+from app import models
 
 router = fa.APIRouter(
     prefix="/time_entries",
