@@ -10,7 +10,7 @@ router = fa.APIRouter(
 
 
 @router.post('/', status_code=fa.status.HTTP_201_CREATED)
-async def add_project(project: models.Project, context: ctx.ApiContextDep) -> models.SavedProject:
+async def add_project(context: ctx.ApiContextDep, project: models.Project) -> models.SavedProject:
     return await context.proj_storage.save_project(project)
 
 
@@ -20,7 +20,7 @@ async def get_projects_list(context: ctx.ApiContextDep) -> list[models.SavedProj
 
 
 @router.get('/{project_id}', status_code=fa.status.HTTP_200_OK)
-async def get_project(project_id: int, context: ctx.ApiContextDep) -> models.SavedProject:
+async def get_project(context: ctx.ApiContextDep, project_id: int) -> models.SavedProject:
     proj = await context.proj_storage.get_project(project_id)
 
     if proj is None:
@@ -31,7 +31,7 @@ async def get_project(project_id: int, context: ctx.ApiContextDep) -> models.Sav
 
 @router.put('/{project_id}', status_code=fa.status.HTTP_200_OK)
 async def update_project(
-        project_id: int, project: models.Project, context: ctx.ApiContextDep
+        context: ctx.ApiContextDep, project_id: int, project: models.Project
 ) -> models.SavedProject:
     proj = await context.proj_storage.update_project(project_id, project)
 

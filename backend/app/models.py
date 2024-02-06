@@ -14,8 +14,8 @@ class SavedProject(Project):
 
 class TimeEntry(BaseModel):
     start: datetime
-    end: datetime | None
-    project: Project | None
+    end: datetime | None = None
+    project_id: int | None = None
 
 
 class SavedTimeEntry(TimeEntry):
