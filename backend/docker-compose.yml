@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
     api:
         build: .
@@ -7,3 +7,27 @@ services:
           - '80:80'
         volumes:
           - "./app:/backend/app"
+        depends_on:
+          - postgres-db
+
+    postgres-db:
+        container_name: postgres_db_container
+        image: postgres:16.1-alpine
+        environment:
+            POSTGRES_DB: "time_tracker_db"
+            POSTGRES_USER: "tracker"
+            POSTGRES_PASSWORD: "qwerty"
+        ports:
+          - "5432:5432"
+        volumes:
+          - ./postgres/init:/docker-entrypoint-initdb.d
+
+#    pgadmin:
+#        container_name: pgadmin_container
+#        image: dpage/pgadmin4:7.2
+#        environment:
+#            PGADMIN_DEFAULT_EMAIL: "email@email.com"
+#            PGADMIN_DEFAULT_PASSWORD: "qwerty"
+#            PGADMIN_CONFIG_SERVER_MODE: "False"
+#        ports:
+#          - "5050:80"
