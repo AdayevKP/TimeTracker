@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+    api:
+        build: .
+        container_name: time_tracker_api
+        ports:
+          - '80:80'
+        volumes:
+          - "./app:/backend/app"
