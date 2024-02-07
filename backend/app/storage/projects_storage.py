@@ -1,4 +1,4 @@
-from app import models
+from app.storage import models
 
 
 class ProjectsStorage:

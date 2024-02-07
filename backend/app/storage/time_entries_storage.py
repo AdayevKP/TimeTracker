@@ -1,7 +1,6 @@
 import datetime
 
-from app import models
-from app.storage import exceptions
+from app.storage import exceptions, models
 from app.storage import projects_storage
 
 
@@ -10,24 +9,24 @@ class TimeEntriesStorage:
     _ENTRIES = {
         1: models.SavedTimeEntry(
             id=1,
-            start=datetime.datetime.strptime('2024-01-13 12:30', "%Y-%m-%d %H:%M")
+            start_time=datetime.datetime.strptime('2024-01-13 12:30', "%Y-%m-%d %H:%M")
         ),
         2: models.SavedTimeEntry(
             id=2,
-            start=datetime.datetime.strptime('2024-01-13 12:30', "%Y-%m-%d %H:%M"),
-            end=datetime.datetime.strptime('2024-01-13 12:40', "%Y-%m-%d %H:%M"),
+            start_time=datetime.datetime.strptime('2024-01-13 12:30', "%Y-%m-%d %H:%M"),
+            end_time=datetime.datetime.strptime('2024-01-13 12:40', "%Y-%m-%d %H:%M"),
             project_id=2
         ),
         3: models.SavedTimeEntry(
             id=3,
-            start=datetime.datetime.strptime('2024-01-13 22:30', "%Y-%m-%d %H:%M"),
-            end=datetime.datetime.strptime('2024-01-13 23:50', "%Y-%m-%d %H:%M"),
+            start_time=datetime.datetime.strptime('2024-01-13 22:30', "%Y-%m-%d %H:%M"),
+            end_time=datetime.datetime.strptime('2024-01-13 23:50', "%Y-%m-%d %H:%M"),
             project_id=1
         ),
         4: models.SavedTimeEntry(
             id=4,
-            start=datetime.datetime.strptime('2024-01-14 10:00', "%Y-%m-%d %H:%M"),
-            end=datetime.datetime.strptime('2024-01-14 13:50', "%Y-%m-%d %H:%M"),
+            start_time=datetime.datetime.strptime('2024-01-14 10:00', "%Y-%m-%d %H:%M"),
+            end_time=datetime.datetime.strptime('2024-01-14 13:50', "%Y-%m-%d %H:%M"),
             project_id=1
         ),
     }

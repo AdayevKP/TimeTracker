@@ -1,14 +1,14 @@
 GRANT ALL PRIVILEGES ON DATABASE time_tracker_db TO tracker;
 
 create table projects(
-    id serial,
+    id INTEGER,
     name text NOT NULL,
     description TEXT,
     primary key(id)
 );
 
 create table time_entries(
-    id serial,
+    id INTEGER,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
     project_id integer,
@@ -18,15 +18,15 @@ create table time_entries(
 
 
 INSERT into projects(
-    name, description
+    id, name, description
 ) values
-('work', 'working hard'),
-('study', NULL),
-('training', 'lifting weights');
+(1, 'work', 'working hard'),
+(2, 'study', NULL),
+(3, 'training', 'lifting weights');
 
 
 INSERT into time_entries(
-    start_time, end_time, project_id
+    id, start_time, end_time, project_id
 ) values
-('2024-01-13 12:30', '2024-01-13 15:45', 1),
-('2024-01-20 22:30', NULL, NULL);
+(1, '2024-01-13 12:30', '2024-01-13 15:45', 1),
+(2, '2024-01-20 22:30', NULL, NULL);

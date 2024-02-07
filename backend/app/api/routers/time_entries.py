@@ -1,9 +1,8 @@
 import fastapi as fa
 import typing as tp
 
-from app import models
 from app.api import context as ctx
-from app.storage import exceptions as storage_exc
+from app.storage import exceptions as storage_exc, models
 
 router = fa.APIRouter(
     prefix="/time_entries",

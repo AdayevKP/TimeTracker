@@ -9,18 +9,21 @@ services:
           - "./app:/backend/app"
         depends_on:
           - postgres-db
+        env_file:
+          - .env
 
     postgres-db:
         container_name: postgres_db_container
         image: postgres:16.1-alpine
         environment:
-            POSTGRES_DB: "time_tracker_db"
-            POSTGRES_USER: "tracker"
-            POSTGRES_PASSWORD: "qwerty"
+            POSTGRES_DB: ${PG_DB_NAME}
+            POSTGRES_USER: ${PG_DB_USER}
+            POSTGRES_PASSWORD: ${PG_DB_PASSWORD}
         ports:
-          - "5432:5432"
+          - ${PG_DB_PORT}:5432
         volumes:
           - ./postgres/init:/docker-entrypoint-initdb.d
+          - ./postgres:/var/lib/postgres/data
 
 #    pgadmin:
 #        container_name: pgadmin_container
