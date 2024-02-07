@@ -1,6 +1,6 @@
 import fastapi as fa
 
-from app import models
+from app.storage import models
 from app.api import context as ctx
 
 router = fa.APIRouter(
