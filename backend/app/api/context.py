@@ -5,14 +5,11 @@ import typing as tp
 from app.storage import projects_storage
 from app.storage import time_entries_storage
 
-ProjectStorageDep = tp.Annotated[projects_storage.ProjectsStorage, fa.Depends()]
-TimeEntryStorageDep = tp.Annotated[time_entries_storage.TimeEntriesStorage, fa.Depends()]
-
 
 @dataclasses.dataclass
 class ApiContext:
-    proj_storage: ProjectStorageDep
-    entries_storage: TimeEntryStorageDep
+    proj_storage: projects_storage.ProjectsStorageDep
+    entries_storage: time_entries_storage.TimeEntriesStorageDep
 
 
 ApiContextDep = tp.Annotated[ApiContext, fa.Depends()]

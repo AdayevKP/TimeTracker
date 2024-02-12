@@ -1,14 +1,14 @@
 GRANT ALL PRIVILEGES ON DATABASE time_tracker_db TO tracker;
 
 create table projects(
-    id INTEGER,
+    id serial NOT NULL,
     name text NOT NULL,
     description TEXT,
     primary key(id)
 );
 
 create table time_entries(
-    id INTEGER,
+    id serial NOT NULL,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
     project_id integer,

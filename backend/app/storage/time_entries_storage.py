@@ -1,10 +1,14 @@
 import datetime
+import typing as tp
+
+import fastapi as fa
 
 from app.storage import exceptions, models
 from app.storage import projects_storage
+from app.storage import common
 
 
-class TimeEntriesStorage:
+class TimeEntriesStorage(common.SAStorage):
     _CUR_ID = 5
     _ENTRIES = {
         1: models.SavedTimeEntry(
@@ -86,3 +90,6 @@ class TimeEntriesStorage:
 
     async def delete_entry(self, entry_id: int) -> models.SavedTimeEntry | None:
         return self._ENTRIES.pop(entry_id, None)
+
+
+TimeEntriesStorageDep = tp.Annotated[TimeEntriesStorage, fa.Depends()]
