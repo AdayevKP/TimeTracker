@@ -3,10 +3,11 @@ services:
     api:
         build: .
         container_name: time_tracker_api
+        command: ["./docker/app.sh"]
         ports:
           - '80:80'
         volumes:
-          - "./app:/backend/app"
+          - ".:/backend"
         depends_on:
           - postgres-db
         env_file:

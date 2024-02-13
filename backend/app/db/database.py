@@ -5,13 +5,12 @@ from app import config
 
 _SETTINGS = config.get_settings()
 
-SQLALCHEMY_DATABASE_URL = (
+DATABASE_URL = (
     f"postgresql+asyncpg://{_SETTINGS.PG_DB_USER}:{_SETTINGS.PG_DB_PASSWORD}@postgres_db_container/{_SETTINGS.PG_DB_NAME}"
 )
 
-async_engine = sa.create_async_engine(SQLALCHEMY_DATABASE_URL)
+async_engine = sa.create_async_engine(DATABASE_URL)
 AsyncSessionLocal: sa.async_sessionmaker[sa.AsyncSession] = (
     sa.async_sessionmaker(async_engine)
 )
 # Base = declarative_base()
-
