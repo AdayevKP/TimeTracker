@@ -7,7 +7,7 @@ services:
         ports:
           - '80:80'
         volumes:
-          - ".:/backend"
+          - ".:/TimeTracker"
         depends_on:
           - postgres-db
         env_file:
