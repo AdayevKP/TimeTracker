@@ -1,44 +1,40 @@
-from app import models
+import typing as tp
+
+import fastapi as fa
+import sqlalchemy as sa
+
+from app.storage import common
+from app.storage import models
+from app.db import models as orm_models
 
 
-class ProjectsStorage:
-    _CUR_PROJ_ID = 4
-    PROJECTS = {
-        1: models.SavedProject(
-            id=1, name="work"
-        ),
-        2: models.SavedProject(
-            id=2, name="study"
-        ),
-        3: models.SavedProject(
-            id=3, name="sport", description='lifting weights'
-        ),
-    }
-
+class ProjectsStorage(common.SAStorage):
     async def get_project(self, proj_id: int) -> models.SavedProject | None:
-        return self.PROJECTS.get(proj_id)
+        proj = await self.session.get(orm_models.Project, proj_id)
+        return proj and models.SavedProject.from_orm(proj)
 
     async def save_project(self, proj: models.Project) -> models.SavedProject:
-        new_proj = models.SavedProject(
-            **{
-                'id': self._CUR_PROJ_ID,
-                **proj.dict()
-            }
+        new_project = orm_models.Project(
+            name=proj.name,
+            description=proj.description
         )
-        self.PROJECTS[self._CUR_PROJ_ID] = new_proj
-        self._CUR_PROJ_ID += 1
-        return new_proj
+        self.session.add(new_project)
+        await self.session.commit()
+        await self.session.refresh(new_project)
+
+        return models.SavedProject.from_orm(new_project)
 
     async def get_all_projects(self) -> list[models.SavedProject]:
-        return list(self.PROJECTS.values())
+        result = await self.session.execute(sa.select(orm_models.Project))
+        return [
+            models.SavedProject.from_orm(r) for r in result.scalars().all()
+        ]
 
     async def update_project(
             self, proj_id: int, new_data: models.Project
     ) -> models.SavedProject | None:
-        if proj_id not in self.PROJECTS:
-            return None
+        updated_proj = await self._update(orm_models.Project, proj_id, new_data)
+        return updated_proj and models.SavedProject.from_orm(updated_proj)
 
-        old_data = self.PROJECTS[proj_id]
-        new_data = old_data.model_copy(update=new_data.dict())
-        self.PROJECTS[proj_id] = new_data
-        return new_data
+
+ProjectsStorageDep = tp.Annotated[ProjectsStorage, fa.Depends()]
