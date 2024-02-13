@@ -9,8 +9,8 @@ RUN python -m pip install --no-cache-dir poetry==1.7.1 \
     && poetry config virtualenvs.create false 
 RUN poetry install
 
-COPY ./app ./app
+COPY time_tracker ./time_tracker
 
 EXPOSE 80
 
-#CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+#CMD ["uvicorn", "time_tracker.app:app", "--host", "0.0.0.0", "--port", "80", "--reload"]

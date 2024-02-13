@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from app.db import models
-from app.db import database
+from time_tracker.db import models
+from time_tracker.db import database
 
 config = context.config
 

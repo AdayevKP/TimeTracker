@@ -2,8 +2,8 @@ import dataclasses
 import fastapi as fa
 import typing as tp
 
-from app.storage import projects_storage
-from app.storage import time_entries_storage
+from time_tracker.storage import projects_storage
+from time_tracker.storage import time_entries_storage
 
 
 @dataclasses.dataclass

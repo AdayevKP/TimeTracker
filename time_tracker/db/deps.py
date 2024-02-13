@@ -3,7 +3,7 @@ import typing as tp
 import fastapi as fa
 from sqlalchemy.ext import asyncio as sa
 
-from app.db import database
+from time_tracker.db import database
 
 
 async def _get_session():

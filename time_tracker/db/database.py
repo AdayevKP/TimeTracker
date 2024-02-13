@@ -1,7 +1,7 @@
 from sqlalchemy.ext import asyncio as sa
 # from sqlalchemy.ext.declarative import declarative_base
 
-from app import config
+from time_tracker import config
 
 _SETTINGS = config.get_settings()
 

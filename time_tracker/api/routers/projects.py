@@ -1,7 +1,7 @@
 import fastapi as fa
 
-from app.storage import models
-from app.api import context as ctx
+from time_tracker.storage import models
+from time_tracker.api import context as ctx
 
 router = fa.APIRouter(
     prefix="/projects",

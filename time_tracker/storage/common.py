@@ -4,9 +4,9 @@ import typing as tp
 import sqlalchemy as sa
 from sqlalchemy import orm
 
-from app.db import deps as db_deps
-from app.db import models as orm_models
-from app.storage import models
+from time_tracker.db import deps as db_deps
+from time_tracker.db import models as orm_models
+from time_tracker.storage import models
 
 
 class WithId(tp.Protocol):

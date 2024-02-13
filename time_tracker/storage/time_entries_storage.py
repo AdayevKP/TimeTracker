@@ -4,10 +4,10 @@ import typing as tp
 import fastapi as fa
 import sqlalchemy as sa
 
-from app.storage import exceptions, models
-from app.storage import projects_storage
-from app.storage import common
-from app.db import models as orm_models
+from time_tracker.storage import exceptions, models
+from time_tracker.storage import projects_storage
+from time_tracker.storage import common
+from time_tracker.db import models as orm_models
 
 
 @dataclasses.dataclass
