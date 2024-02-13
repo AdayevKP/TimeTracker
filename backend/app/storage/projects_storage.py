@@ -33,17 +33,7 @@ class ProjectsStorage(common.SAStorage):
     async def update_project(
             self, proj_id: int, new_data: models.Project
     ) -> models.SavedProject | None:
-        query = (
-            sa.update(orm_models.Project)
-            .returning(orm_models.Project)
-            .where(orm_models.Project.id == proj_id)
-            .values(new_data.dict(exclude_unset=True))
-        )
-        result = await self.session.execute(query)
-        updated_proj = result.scalars().first()
-        await self.session.commit()
-        await self.session.refresh(updated_proj)
-
+        updated_proj = await self._update(orm_models.Project, proj_id, new_data)
         return updated_proj and models.SavedProject.from_orm(updated_proj)
 
 

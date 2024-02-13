@@ -53,17 +53,7 @@ class TimeEntriesStorage(common.SAStorage):
         ]
 
     async def update_entry(self, entry_id: int, new_data: models.TimeEntry) -> models.SavedTimeEntry | None:
-        query = (
-            sa.update(orm_models.TimeEntry)
-            .returning(orm_models.TimeEntry)
-            .where(orm_models.TimeEntry.id == entry_id)
-            .values(new_data.dict(exclude_unset=True))
-        )
-        result = await self.session.execute(query)
-        updated_entry = result.scalars().first()
-        await self.session.commit()
-        await self.session.refresh(updated_entry)
-
+        updated_entry = await self._update(orm_models.TimeEntry, entry_id, new_data)
         return updated_entry and models.SavedTimeEntry.from_orm(updated_entry)
 
     async def delete_entry(self, entry_id: int) -> models.SavedTimeEntry | None:
