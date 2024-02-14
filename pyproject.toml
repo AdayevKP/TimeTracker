@@ -17,7 +17,13 @@ asyncpg = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
 alembic = "^1.13.1"
+black = "^24.2.0"
+pre-commit = "^3.6.1"
 
 [build-system]
 requires = ["poetry-core=^1.7.1"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+target-version = ['py311']
