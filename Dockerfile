@@ -6,7 +6,7 @@ COPY poetry.lock pyproject.toml ./
 
 RUN python -m pip install --no-cache-dir poetry==1.7.1 \
     # this flag for installing all deps to system python
-    && poetry config virtualenvs.create false 
+    && poetry config virtualenvs.create false
 RUN poetry install
 
 COPY time_tracker ./time_tracker

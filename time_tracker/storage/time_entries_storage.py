@@ -17,11 +17,13 @@ class TimeEntriesStorage(common.SAStorage):
     async def get_entry(self, entry_id: int) -> models.SavedTimeEntry | None:
         return await self.session.get(orm_models.TimeEntry, entry_id)
 
-    async def save_entry(self, entry: models.TimeEntry) -> models.SavedTimeEntry:
+    async def save_entry(
+        self, entry: models.TimeEntry
+    ) -> models.SavedTimeEntry:
         new_entry = orm_models.TimeEntry(
             start_time=entry.start_time,
             end_time=entry.end_time,
-            project_id=entry.project_id
+            project_id=entry.project_id,
         )
         self.session.add(new_entry)
         await self.session.commit()
@@ -29,16 +31,15 @@ class TimeEntriesStorage(common.SAStorage):
         return models.SavedTimeEntry.from_orm(new_entry)
 
     async def get_all_entries(
-            self, offset: int | None, limit: int | None, project_id: int | None
+        self, offset: int | None, limit: int | None, project_id: int | None
     ) -> list[models.SavedTimeEntry]:
         if project_id is not None:
             proj = await self.projects_storage.get_project(project_id)
             if proj is None:
                 raise exceptions.ProjectNotFound()
 
-        query = (
-            sa.select(orm_models.TimeEntry)
-            .order_by(orm_models.TimeEntry.start_time)
+        query = sa.select(orm_models.TimeEntry).order_by(
+            orm_models.TimeEntry.start_time
         )
         if project_id is not None:
             query = query.where(orm_models.TimeEntry.project_id == project_id)
@@ -52,19 +53,25 @@ class TimeEntriesStorage(common.SAStorage):
             models.SavedTimeEntry.from_orm(r) for r in result.scalars().all()
         ]
 
-    async def update_entry(self, entry_id: int, new_data: models.TimeEntry) -> models.SavedTimeEntry | None:
-        updated_entry = await self._update(orm_models.TimeEntry, entry_id, new_data)
+    async def update_entry(
+        self, entry_id: int, new_data: models.TimeEntry
+    ) -> models.SavedTimeEntry | None:
+        updated_entry = await self._update(
+            orm_models.TimeEntry, entry_id, new_data
+        )
         return updated_entry and models.SavedTimeEntry.from_orm(updated_entry)
 
-    async def delete_entry(self, entry_id: int) -> models.SavedTimeEntry | None:
+    async def delete_entry(
+        self, entry_id: int
+    ) -> models.SavedTimeEntry | None:
         result = await self.session.execute(
             sa.delete(orm_models.TimeEntry)
             .where(orm_models.TimeEntry.id == entry_id)
             .returning(orm_models.TimeEntry)
         )
         deleted_entry = result.scalars().first()
-        deleted_entry = (
-                deleted_entry and models.SavedTimeEntry.from_orm(deleted_entry)
+        deleted_entry = deleted_entry and models.SavedTimeEntry.from_orm(
+            deleted_entry
         )
         await self.session.commit()
         return deleted_entry

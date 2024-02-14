@@ -15,8 +15,7 @@ class ProjectsStorage(common.SAStorage):
 
     async def save_project(self, proj: models.Project) -> models.SavedProject:
         new_project = orm_models.Project(
-            name=proj.name,
-            description=proj.description
+            name=proj.name, description=proj.description
         )
         self.session.add(new_project)
         await self.session.commit()
@@ -31,9 +30,11 @@ class ProjectsStorage(common.SAStorage):
         ]
 
     async def update_project(
-            self, proj_id: int, new_data: models.Project
+        self, proj_id: int, new_data: models.Project
     ) -> models.SavedProject | None:
-        updated_proj = await self._update(orm_models.Project, proj_id, new_data)
+        updated_proj = await self._update(
+            orm_models.Project, proj_id, new_data
+        )
         return updated_proj and models.SavedProject.from_orm(updated_proj)
 
 
