@@ -2,6 +2,7 @@ import fastapi as fa
 
 from time_tracker.api.routers import projects, time_entries
 
+
 app = fa.FastAPI()
 app.include_router(projects.router)
 app.include_router(time_entries.router)

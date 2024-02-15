@@ -3,9 +3,8 @@ import typing as tp
 import fastapi as fa
 import sqlalchemy as sa
 
-from time_tracker.storage import common
-from time_tracker.storage import models
 from time_tracker.db import models as orm_models
+from time_tracker.storage import common, models
 
 
 class ProjectsStorage(common.SAStorage):
