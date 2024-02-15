@@ -6,7 +6,7 @@ from sqlalchemy.ext import asyncio as sa
 from time_tracker.db import database
 
 
-async def _get_session():
+async def _get_session() -> tp.AsyncGenerator[sa.AsyncSession, None]:
     async with database.AsyncSessionLocal() as sess:
         yield sess
 

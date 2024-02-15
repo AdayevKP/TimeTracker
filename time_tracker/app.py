@@ -9,10 +9,12 @@ app.include_router(time_entries.router)
 
 
 @app.exception_handler(fa.exceptions.RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(
+    request: fa.Request, exc: fa.exceptions.RequestValidationError
+) -> fa.Response:
     return fa.responses.PlainTextResponse(str(exc), status_code=400)
 
 
 @app.get("/")
-async def root():
+async def root() -> dict[str, str]:
     return {"message": "Hello Time Tracker!"}
