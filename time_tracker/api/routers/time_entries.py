@@ -3,8 +3,8 @@ import typing as tp
 import fastapi as fa
 
 from time_tracker.api import context as ctx
+from time_tracker.api import models
 from time_tracker.storage import exceptions as storage_exc
-from time_tracker.storage import models
 
 
 router = fa.APIRouter(
@@ -15,8 +15,8 @@ router = fa.APIRouter(
 
 @router.post("/")
 async def add_entry(
-    context: ctx.ApiContextDep, entry: models.TimeEntry
-) -> models.SavedTimeEntry:
+    context: ctx.ApiContextDep, entry: models.TimeEntryApi
+) -> models.SavedTimeEntryApi:
     try:
         return await context.entries_storage.save_entry(entry)
     except storage_exc.ProjectNotFound:
@@ -31,7 +31,7 @@ async def get_entries_list(
     project_id: int | None = None,
     offset: int = 0,
     limit: tp.Annotated[int, fa.Query(le=100)] = 20,
-) -> list[models.SavedTimeEntry]:
+) -> list[models.SavedTimeEntryApi]:
     try:
         return await context.entries_storage.get_all_entries(
             offset, limit, project_id
@@ -45,7 +45,7 @@ async def get_entries_list(
 @router.get("/{entry_id}")
 async def get_entry(
     context: ctx.ApiContextDep, entry_id: int
-) -> models.SavedTimeEntry:
+) -> models.SavedTimeEntryApi:
     entry = await context.entries_storage.get_entry(entry_id)
 
     if entry is None:
@@ -58,8 +58,8 @@ async def get_entry(
 
 @router.put("/{entry_id}")
 async def update_entry(
-    context: ctx.ApiContextDep, entry_id: int, entry: models.TimeEntry
-) -> models.SavedTimeEntry:
+    context: ctx.ApiContextDep, entry_id: int, entry: models.TimeEntryApi
+) -> models.SavedTimeEntryApi:
     try:
         updated_entry = await context.entries_storage.update_entry(
             entry_id, entry
@@ -80,7 +80,7 @@ async def update_entry(
 @router.delete("/{entry_id}")
 async def delete_entry(
     context: ctx.ApiContextDep, entry_id: int
-) -> models.SavedTimeEntry:
+) -> models.SavedTimeEntryApi:
     deleted_entry = await context.entries_storage.delete_entry(entry_id)
 
     if deleted_entry is None:
