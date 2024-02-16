@@ -1,26 +1,33 @@
 import dataclasses
 import typing as tp
 
+import pydantic
 import sqlalchemy as sa
 from sqlalchemy import orm
 
 from time_tracker.db import deps as db_deps
 from time_tracker.db import models as orm_models
-from time_tracker.storage import models
 
 
 class WithId(tp.Protocol):
     id: orm.Mapped[int]
 
 
-OrmObjWithIdT = tp.TypeVar('OrmObjWithIdT', bound=tp.Union[WithId, orm_models.Base])
+OrmObjWithIdT = tp.TypeVar(
+    "OrmObjWithIdT", bound=tp.Union[WithId, orm_models.Base]
+)
 
 
 @dataclasses.dataclass
 class SAStorage:
     session: db_deps.SessionDep
 
-    async def _update(self, model: tp.Type[OrmObjWithIdT], row_id: int, new_data: models.BaseModel) -> OrmObjWithIdT:
+    async def _update(
+        self,
+        model: tp.Type[OrmObjWithIdT],
+        row_id: int,
+        new_data: pydantic.BaseModel,
+    ) -> OrmObjWithIdT:
         query = (
             sa.update(model)
             .returning(model)

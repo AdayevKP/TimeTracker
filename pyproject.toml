@@ -14,10 +14,47 @@ pydantic-settings = "^2.1.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
 asyncpg = "^0.29.0"
 
-
 [tool.poetry.group.dev.dependencies]
 alembic = "^1.13.1"
+black = "^24.2.0"
+pre-commit = "^3.6.1"
+mypy = "^1.8.0"
+ruff = "^0.2.1"
+flake8 = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core=^1.7.1"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I"
+]
+ignore = ["B904"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+lines-after-imports = 2
+
+[tool.mypy]
+strict = true
+
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
+warn_return_any = false

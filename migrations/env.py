@@ -1,14 +1,13 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from alembic import context
+from time_tracker.db import database, models
 
-from time_tracker.db import models
-from time_tracker.db import database
 
 config = context.config
 
@@ -18,7 +17,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = models.Base.metadata
-config.set_main_option('sqlalchemy.url', database.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", database.DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
