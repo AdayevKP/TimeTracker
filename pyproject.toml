@@ -57,7 +57,6 @@ force-sort-within-sections = true
 lines-after-imports = 2
 
 [tool.mypy]
-exclude = '(?x)(^test_*)'
 strict = true
 disallow_subclassing_any = false
 disallow_untyped_decorators = false

@@ -6,9 +6,9 @@ from sqlalchemy.ext import asyncio as sa
 from time_tracker.db import database
 
 
-async def _get_session() -> tp.AsyncGenerator[sa.AsyncSession, None]:
+async def get_session() -> tp.AsyncGenerator[sa.AsyncSession, None]:
     async with database.AsyncSessionLocal() as sess:
         yield sess
 
 
-SessionDep = tp.Annotated[sa.AsyncSession, fa.Depends(_get_session)]
+SessionDep = tp.Annotated[sa.AsyncSession, fa.Depends(get_session)]
