@@ -61,6 +61,9 @@ strict = true
 disallow_subclassing_any = false
 disallow_untyped_decorators = false
 warn_return_any = false
+exclude = [
+    "tests"
+]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
