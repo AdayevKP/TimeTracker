@@ -27,7 +27,7 @@ class SAStorage:
         model: tp.Type[OrmObjWithIdT],
         row_id: int,
         new_data: pydantic.BaseModel,
-    ) -> OrmObjWithIdT:
+    ) -> tp.Optional[OrmObjWithIdT]:
         query = (
             sa.update(model)
             .returning(model)
@@ -36,6 +36,10 @@ class SAStorage:
         )
         result = await self.session.execute(query)
         updated_data = result.scalars().first()
+
+        if updated_data is None:
+            return None
+
         await self.session.commit()
         await self.session.refresh(updated_data)
 

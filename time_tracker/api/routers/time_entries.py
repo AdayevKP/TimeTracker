@@ -13,7 +13,7 @@ router = fa.APIRouter(
 )
 
 
-@router.post("/")
+@router.post("/", status_code=fa.status.HTTP_201_CREATED)
 async def add_entry(
     context: ctx.ApiContextDep, entry: models.TimeEntryApi
 ) -> models.SavedTimeEntryApi:
@@ -25,7 +25,7 @@ async def add_entry(
         )
 
 
-@router.get("/")
+@router.get("/", status_code=fa.status.HTTP_200_OK)
 async def get_entries_list(
     context: ctx.ApiContextDep,
     project_id: int | None = None,
@@ -42,7 +42,7 @@ async def get_entries_list(
         )
 
 
-@router.get("/{entry_id}")
+@router.get("/{entry_id}", status_code=fa.status.HTTP_200_OK)
 async def get_entry(
     context: ctx.ApiContextDep, entry_id: int
 ) -> models.SavedTimeEntryApi:
@@ -56,7 +56,7 @@ async def get_entry(
     return entry
 
 
-@router.put("/{entry_id}")
+@router.put("/{entry_id}", status_code=fa.status.HTTP_200_OK)
 async def update_entry(
     context: ctx.ApiContextDep, entry_id: int, entry: models.TimeEntryApi
 ) -> models.SavedTimeEntryApi:
@@ -77,7 +77,7 @@ async def update_entry(
     return updated_entry
 
 
-@router.delete("/{entry_id}")
+@router.delete("/{entry_id}", status_code=fa.status.HTTP_200_OK)
 async def delete_entry(
     context: ctx.ApiContextDep, entry_id: int
 ) -> models.SavedTimeEntryApi:
