@@ -1,23 +1,24 @@
 name: CI
 
 on:
+    push:
+        branches: [ "main" ]
     pull_request:
+        branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
-    run_tests:
-        strategy:
-            fail-fast: false
-            matrix:
-                os: ubuntu-latest
+    build:
 
-        name: Tests
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
         steps:
-            - name: checkout code
-              uses: actions/checkout@v3
+          - name: checkout code
+            uses: actions/checkout@v3
 
-            - name: run tests
-              run: |
-                    docker-compose -f docker-compose-test.yml up -d --build
-                    docker-compose -f docker-compose-test.yml exec -T api pytest -vv
-                    docker-compose -f docker-compose-test.yml down -v
+          - name: run tests
+            run: |
+                docker-compose -f docker-compose-test.yml up -d --build
+                docker-compose -f docker-compose-test.yml exec -T api pytest -vv
+                docker-compose -f docker-compose-test.yml down -v
