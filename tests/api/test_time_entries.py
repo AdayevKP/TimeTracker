@@ -20,16 +20,29 @@ async def project(async_session, reset_primary_key):
 
 
 @pytest.fixture(scope="function")
-async def reset_time_entries(async_session, reset_primary_key):
-    yield
+async def existing_time_entry(async_session, reset_primary_key, project):
+
+    entry = models.TimeEntry(
+        start_time=datetime.datetime.strptime(
+            "2024-02-11 23:00", "%Y-%m-%d %H:%M"
+        ),
+        end_time=datetime.datetime.strptime(
+            "2024-02-12 03:31", "%Y-%m-%d %H:%M"
+        ),
+        project_id=project,
+    )
+    async_session.add(entry)
+    await async_session.commit()
+    await async_session.refresh(entry)
+    yield entry.id
     await reset_primary_key("time_entries", "id")
 
 
-@pytest.mark.usefixtures("reset_time_entries")
 async def test_flow(
     client: httpx.AsyncClient,
     async_session: sa.AsyncSession,
     project: int,
+    existing_time_entry: int,
 ):
     # create time entry
     resp = await client.post(
@@ -39,21 +52,37 @@ async def test_flow(
     time_entry = resp.json()
 
     # look at it
-    entry_id = time_entry["id"]
-    resp = await client.get(f"/time_entries/{entry_id}")
+    created_entry_id = time_entry["id"]
+    resp = await client.get(f"/time_entries/{created_entry_id}")
     assert resp.status_code == 200
     assert resp.json() == {
-        "id": 1,
+        "id": created_entry_id,
         "start_time": "2024-02-14T13:00:00",
         "end_time": None,
         "project_id": None,
     }
 
-    # look at all entries?
+    # look at all entries
+    resp = await client.get("/time_entries/")
+    assert resp.status_code == 200
+    assert resp.json() == [
+        {
+            "id": existing_time_entry,
+            "start_time": "2024-02-11T23:00:00",
+            "end_time": "2024-02-12T03:31:00",
+            "project_id": project,
+        },
+        {
+            "id": created_entry_id,
+            "start_time": "2024-02-14T13:00:00",
+            "end_time": None,
+            "project_id": None,
+        },
+    ]
 
     # stop timer and add project to your time entry
     resp = await client.put(
-        f"/time_entries/{entry_id}",
+        f"/time_entries/{created_entry_id}",
         json={
             **time_entry,
             "end_time": "2024-02-14 13:31",
@@ -62,18 +91,20 @@ async def test_flow(
     )
     assert resp.status_code == 200
     assert resp.json() == {
-        "id": 1,
+        "id": created_entry_id,
         "start_time": "2024-02-14T13:00:00",
         "end_time": "2024-02-14T13:31:00",
         "project_id": project,
     }
 
     db_entry = await async_session.execute(
-        sqlalchemy.text("Select * from time_entries where id = 1")
+        sqlalchemy.text(
+            f"Select * from time_entries where id = {created_entry_id}"
+        )
     )
     entry = db_entry.mappings().first()
     assert entry == {
-        "id": 1,
+        "id": created_entry_id,
         "start_time": datetime.datetime.strptime(
             "2024-02-14 13:00", "%Y-%m-%d %H:%M"
         ),
@@ -84,17 +115,13 @@ async def test_flow(
     }
 
     # delete
-    resp = await client.delete(f"/time_entries/{entry_id}")
+    resp = await client.delete(f"/time_entries/{created_entry_id}")
     assert resp.status_code == 200
-    assert resp.json() == {
-        "id": 1,
-        "start_time": "2024-02-14T13:00:00",
-        "end_time": "2024-02-14T13:31:00",
-        "project_id": project,
-    }
 
     db_entry = await async_session.execute(
-        sqlalchemy.text("Select * from time_entries where id = 1")
+        sqlalchemy.text(
+            f"Select * from time_entries where id = {created_entry_id}"
+        )
     )
     entry = db_entry.mappings().first()
     assert entry is None
@@ -140,6 +167,19 @@ class TestErrors:
                 "start_time": "2024-02-14T13:00:00",
                 "end_time": "2024-02-14T13:31:00",
                 "project_id": 5,
+            },
+        )
+        assert resp.status_code == 400
+
+    async def test_start_after_end_time(
+        self, client: httpx.AsyncClient, project
+    ):
+        resp = await client.post(
+            "time_entries/",
+            json={
+                "end_time": "2024-02-14T13:00:00",
+                "start_time": "2024-02-14T13:31:00",
+                "project_id": project,
             },
         )
         assert resp.status_code == 400

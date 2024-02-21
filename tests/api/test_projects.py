@@ -79,3 +79,18 @@ async def test_update_project(client: httpx.AsyncClient):
         "name": "work",
         "description": "working hard",
     }
+
+
+class TestErrors:
+    @pytest.mark.usefixtures("fill_db")
+    async def test_get_fake_project(self, client: httpx.AsyncClient):
+        response = await client.get("/projects/521")
+        assert response.status_code == 404
+
+    @pytest.mark.usefixtures("fill_db")
+    async def test_update_fake_project(self, client: httpx.AsyncClient):
+        response = await client.put(
+            "/projects/101",
+            json={"name": "work", "description": "working hard"},
+        )
+        assert response.status_code == 404
