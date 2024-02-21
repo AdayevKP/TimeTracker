@@ -50,7 +50,3 @@ async def update_project(
         )
 
     return proj
-
-
-def this_functions_is_too_long_and_not_in_code_style_and_no_typing_1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa(a, b, c, d, t, f):
-    return 12
