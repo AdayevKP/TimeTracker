@@ -10,6 +10,8 @@ services:
           - ".:/TimeTracker"
         depends_on:
           - postgres-db
+        env_file:
+          - tests/.env-tests
 
     postgres-db:
         container_name: postgres_db_container
