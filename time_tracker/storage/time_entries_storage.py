@@ -18,6 +18,11 @@ class TimeEntriesStorage(common.SAStorage):
     async def save_entry(
         self, entry: models.TimeEntry
     ) -> models.SavedTimeEntry:
+        if entry.project_id is not None:
+            proj = await self.projects_storage.get_project(entry.project_id)
+            if proj is None:
+                raise exceptions.ProjectNotFound()
+
         new_entry = orm_models.TimeEntry(
             start_time=entry.start_time,
             end_time=entry.end_time,
@@ -54,6 +59,11 @@ class TimeEntriesStorage(common.SAStorage):
     async def update_entry(
         self, entry_id: int, new_data: models.TimeEntry
     ) -> models.SavedTimeEntry | None:
+        if new_data.project_id is not None:
+            proj = await self.projects_storage.get_project(new_data.project_id)
+            if proj is None:
+                raise exceptions.ProjectNotFound()
+
         updated_entry = await self._update(
             orm_models.TimeEntry, entry_id, new_data
         )
