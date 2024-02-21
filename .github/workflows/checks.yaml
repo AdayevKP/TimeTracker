@@ -1,0 +1,41 @@
+name: checks
+
+on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+        types:
+          - opened
+          - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+    style:
+        name: check code style
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-python@v5
+            with:
+                python-version: "3.12"
+          - uses: pre-commit/action@v3.0.1
+
+    build:
+        name: tests
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+
+          - name: Set up Python 3.12
+            uses: actions/setup-python@v4
+            with:
+               python-version: "3.12"
+
+          - name: run_tests
+            run: |
+                docker-compose --env-file tests/.env-tests -f docker-compose-test.yml up -d --build
+                docker-compose --env-file tests/.env-tests -f docker-compose-test.yml exec -T api pytest -vv
+                docker-compose --env-file tests/.env-tests -f docker-compose-test.yml down -v

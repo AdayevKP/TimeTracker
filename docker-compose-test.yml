@@ -11,7 +11,7 @@ services:
         depends_on:
           - postgres-db
         env_file:
-          - .env
+          - tests/.env-tests
 
     postgres-db:
         container_name: postgres_db_container
@@ -22,3 +22,5 @@ services:
             POSTGRES_PASSWORD: ${PG_DB_PASSWORD}
         ports:
           - ${PG_DB_PORT}:5432
+        env_file:
+          - tests/.env-tests
