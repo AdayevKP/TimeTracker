@@ -1,14 +1,17 @@
 name: CI
 
 on:
-    push:
     pull_request:
 
 jobs:
     run_tests:
         strategy:
             fail-fast: false
+            matrix:
+                os: ubuntu-latest
 
+        name: Tests
+        runs-on: ${{ matrix.os }}
         steps:
             - name: checkout code
               uses: actions/checkout@v3
