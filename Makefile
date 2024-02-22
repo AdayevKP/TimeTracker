@@ -9,5 +9,5 @@ update-env:
 	poetry update
 run-tests:
 	docker-compose --env-file tests/.env-tests -f docker-compose-test.yml up -d --build && \
-	docker-compose --env-file tests/.env-tests -f docker-compose-test.yml exec api pytest -vv&& \
+	docker-compose --env-file tests/.env-tests -f docker-compose-test.yml exec api pytest tests/api/ -vv&& \
 	docker-compose --env-file tests/.env-tests -f docker-compose-test.yml down -v
