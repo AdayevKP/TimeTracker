@@ -2,12 +2,22 @@
 
 Simple service for tracking your time.
 
-It is my educational project. Made mainly to remember FastAPI, SQLAlchemy and practice in other dfferent tools.
+It is my educational project. Made mainly to remember FastAPI, SQLAlchemy and practice in dfferent tools.
 
 Web UI for this project: https://github.com/AdayevKP/TimeTrackerUI
 
-# Getting started for demo
-Todo
+# Getting started for demo/frontend dev
+1. create `.env` file in project root directory (you can just copy content of tests/.env-tests)
+2. run `docker-compose up` from project root
+3. checkout docs at `http://0.0.0.0:80/docs`
 
-# Getting started for development
-Todo
+# Getting started for backend development
+  Make sure that you have `make` installed in your system (for mac `brew install make`)
+  Install python3.12 and pip install poetry
+  
+  Run `make full-setup` for full setup (if you trust me) or execute step by step:
+1. install venv `make create-env`
+2. activate venv `$(poetry env info --path)/bin/activate`
+3. install pre-commit hooks `pre-commit install`
+4. run all mypy and style checks `pre-commit run --all-files`
+5. run tests 'make run-tests'
