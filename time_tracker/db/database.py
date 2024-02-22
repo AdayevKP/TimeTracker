@@ -8,7 +8,7 @@ _SETTINGS = config.get_settings()
 
 DATABASE_URL = (
     f"postgresql+asyncpg://{_SETTINGS.PG_DB_USER}"  # noqa: E231
-    f":{_SETTINGS.PG_DB_PASSWORD}@postgres_db_container/"  # noqa: E231
+    f":{_SETTINGS.PG_DB_PASSWORD}@{_SETTINGS.PG_DB_HOST}/"  # noqa: E231
     f"{_SETTINGS.PG_DB_NAME}"
 )
 

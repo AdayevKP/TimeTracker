@@ -82,7 +82,7 @@ async def engine_conn() -> tp.AsyncGenerator[sa.AsyncConnection, None]:
 
 @pytest.fixture(scope="function")
 async def client(async_session) -> tp.AsyncIterator[httpx.AsyncClient]:
-    async def override_get_session():  # type: ignore
+    async def override_get_session():
         yield async_session
 
     app.app.dependency_overrides[db_deps.get_session] = override_get_session

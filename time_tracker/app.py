@@ -1,11 +1,12 @@
 import fastapi as fa
 
-from time_tracker.api.routers import projects, time_entries
+from time_tracker.api.routers import projects, stats, time_entries
 
 
 app = fa.FastAPI()
 app.include_router(projects.router)
 app.include_router(time_entries.router)
+app.include_router(stats.router)
 
 
 @app.exception_handler(fa.exceptions.RequestValidationError)
