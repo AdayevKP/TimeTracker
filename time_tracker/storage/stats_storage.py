@@ -40,21 +40,25 @@ class StatsStorage(common.SAStorage):
     async def _get_total_time(
         self, start: datetime.datetime, end: datetime.datetime
     ) -> datetime.timedelta:
-        query = sa.select(
-            func.sum(
-                _min(tbl.TimeEntry.end_time, end)
-                - _max(tbl.TimeEntry.start_time, start)
+        query = (
+            sa.select(
+                func.sum(
+                    _min(tbl.TimeEntry.end_time, end)
+                    - _max(tbl.TimeEntry.start_time, start)
+                )
             )
-        ).filter(
-            tbl.TimeEntry.start_time.between(start, end)
-            | tbl.TimeEntry.end_time.between(start, end)
+            .filter(
+                tbl.TimeEntry.start_time.between(start, end)
+                | tbl.TimeEntry.end_time.between(start, end)
+            )
+            .filter(tbl.TimeEntry.end_time.is_not(None))
         )
 
         async with self.session_factory() as session:
             res = await session.execute(query)
 
         total_time = res.scalars().first()
-        return total_time
+        return total_time or datetime.timedelta()
 
     async def _get_time_per_project(
         self, start: datetime.datetime, end: datetime.datetime
@@ -71,6 +75,7 @@ class StatsStorage(common.SAStorage):
                 tbl.TimeEntry.start_time.between(start, end)
                 | tbl.TimeEntry.end_time.between(start, end)
             )
+            .filter(tbl.TimeEntry.end_time.is_not(None))
             .group_by(tbl.TimeEntry.project_id)
         )
 
@@ -97,6 +102,7 @@ class StatsStorage(common.SAStorage):
                 tbl.TimeEntry.start_time.between(start, end)
                 | tbl.TimeEntry.end_time.between(start, end)
             )
+            .filter(tbl.TimeEntry.end_time.is_not(None))
             .subquery()
         )
 
