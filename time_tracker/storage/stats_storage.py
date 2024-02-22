@@ -5,10 +5,12 @@ import typing as tp
 
 import fastapi as fa
 import sqlalchemy as sa
+from sqlalchemy import orm
+from sqlalchemy.sql import expression as ex
 from sqlalchemy.sql import functions as func
 
 from time_tracker.db import deps as db_deps
-from time_tracker.db import models as orm
+from time_tracker.db import models as tbl
 from time_tracker.storage import common
 
 
@@ -23,69 +25,98 @@ class FullStats(tp.NamedTuple):
     time_per_day: TimePerDay
 
 
+def _min(a: orm.Mapped[tp.Any], b: tp.Any) -> sa.Case[tp.Any]:
+    return ex.case((a > b, b), else_=a)
+
+
+def _max(a: orm.Mapped[tp.Any], b: tp.Any) -> sa.Case[tp.Any]:
+    return ex.case((a > b, a), else_=b)
+
+
 @dataclasses.dataclass
 class StatsStorage(common.SAStorage):
     session_factory: db_deps.SessionFactoryDep
 
     async def _get_total_time(
-        self, start_date: datetime.date, end_date: datetime.date
+        self, start: datetime.datetime, end: datetime.datetime
     ) -> datetime.timedelta:
-        async with self.session_factory() as session:
-            query = await session.execute(
-                sa.select(
-                    func.sum(orm.TimeEntry.end_time - orm.TimeEntry.start_time)
-                )
-                .filter(orm.TimeEntry.end_time <= end_date)
-                .filter(orm.TimeEntry.start_time >= start_date)
+        query = sa.select(
+            func.sum(
+                _min(tbl.TimeEntry.end_time, end)
+                - _max(tbl.TimeEntry.start_time, start)
             )
-        total_time = query.scalars().first()
+        ).filter(
+            tbl.TimeEntry.start_time.between(start, end)
+            | tbl.TimeEntry.end_time.between(start, end)
+        )
+
+        async with self.session_factory() as session:
+            res = await session.execute(query)
+
+        total_time = res.scalars().first()
         return total_time
 
     async def _get_time_per_project(
-        self, start_date: datetime.date, end_date: datetime.date
+        self, start: datetime.datetime, end: datetime.datetime
     ) -> TimePerProject:
-        async with self.session_factory() as session:
-            query = await session.execute(
-                sa.select(
-                    orm.TimeEntry.project_id,
-                    func.sum(
-                        orm.TimeEntry.end_time - orm.TimeEntry.start_time
-                    ),
-                )
-                .filter(orm.TimeEntry.end_time <= end_date)
-                .filter(orm.TimeEntry.start_time >= start_date)
-                .group_by(orm.TimeEntry.project_id)
+        query = (
+            sa.select(
+                tbl.TimeEntry.project_id,
+                func.sum(
+                    _min(tbl.TimeEntry.end_time, end)
+                    - _max(tbl.TimeEntry.start_time, start)
+                ),
             )
+            .filter(
+                tbl.TimeEntry.start_time.between(start, end)
+                | tbl.TimeEntry.end_time.between(start, end)
+            )
+            .group_by(tbl.TimeEntry.project_id)
+        )
 
-        time_per_project = query.fetchall()
+        async with self.session_factory() as session:
+            res = await session.execute(query)
+
+        time_per_project = res.fetchall()
         return time_per_project
 
     async def _get_time_per_day(
-        self, start_date: datetime.date, end_date: datetime.date
+        self, start: datetime.datetime, end: datetime.datetime
     ) -> TimePerDay:
-        async with self.session_factory() as session:
-            query = await session.execute(
-                sa.select(
-                    sa.cast(orm.TimeEntry.start_time, sa.Date),
-                    func.sum(
-                        orm.TimeEntry.end_time - orm.TimeEntry.start_time
-                    ),
-                )
-                .filter(orm.TimeEntry.end_time <= end_date)
-                .filter(orm.TimeEntry.start_time >= start_date)
-                .group_by(sa.cast(orm.TimeEntry.start_time, sa.Date))
+        time_by_start = (
+            sa.select(
+                sa.cast(_max(tbl.TimeEntry.start_time, start), sa.Date).label(
+                    "start_date"
+                ),
+                (
+                    _min(tbl.TimeEntry.end_time, end)
+                    - _max(tbl.TimeEntry.start_time, start)
+                ).label("time"),
             )
+            .filter(
+                tbl.TimeEntry.start_time.between(start, end)
+                | tbl.TimeEntry.end_time.between(start, end)
+            )
+            .subquery()
+        )
 
-        time_per_day = query.fetchall()
+        query = sa.select(
+            time_by_start.c.start_date, func.sum(time_by_start.c.time)
+        ).group_by(time_by_start.c.start_date)
+
+        async with self.session_factory() as session:
+            res = await session.execute(query)
+
+        time_per_day = res.fetchall()
         return {d: t for d, t in time_per_day}
 
     async def get_full_time_stats(
-        self, start_date: datetime.date, end_date: datetime.date
+        self, start: datetime.datetime, end: datetime.datetime
     ) -> FullStats:
         res = await asyncio.gather(
-            self._get_total_time(start_date, end_date),
-            self._get_time_per_project(start_date, end_date),
-            self._get_time_per_day(start_date, end_date),
+            self._get_total_time(start, end),
+            self._get_time_per_project(start, end),
+            self._get_time_per_day(start, end),
         )
         return FullStats(*res)
 

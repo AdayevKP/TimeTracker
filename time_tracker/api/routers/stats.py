@@ -18,7 +18,12 @@ async def get_stats(
     storage: stats_storage.StatsStorageDep, req: models.StatsRequestApi
 ) -> models.StatsResponseApi:
     start_date, end_date = time_intervals.get_date_bounds(req.scale.value)
-    stats = await storage.get_full_time_stats(start_date, end_date)
+
+    end = datetime.datetime.combine(
+        end_date + datetime.timedelta(days=1), datetime.datetime.min.time()
+    )
+    start = datetime.datetime.combine(start_date, datetime.datetime.min.time())
+    stats = await storage.get_full_time_stats(start, end)
 
     return models.StatsResponseApi(
         total_time=stats.total_time,
