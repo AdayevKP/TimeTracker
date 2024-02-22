@@ -1,8 +1,6 @@
 # TimeTracker Backend
 
-Simple service for tracking your time.
-
-It is my educational project. Made mainly to remember FastAPI, SQLAlchemy and practice in dfferent tools.
+Simple service for tracking your time. It is my educational project.
 
 Web UI for this project: https://github.com/AdayevKP/TimeTrackerUI
 
@@ -15,9 +13,12 @@ Web UI for this project: https://github.com/AdayevKP/TimeTrackerUI
   Make sure that you have `make` installed in your system (for mac `brew install make`)
   Install python3.12 and pip install poetry
   
+0. create `.env` file in project root directory (you can just copy content of tests/.env-tests)
+ 
   Run `make full-setup` for full setup (if you trust me) or execute step by step:
 1. install venv `make create-env`
-2. activate venv `$(poetry env info --path)/bin/activate`
-3. install pre-commit hooks `pre-commit install`
-4. run all mypy and style checks `pre-commit run --all-files`
-5. run tests 'make run-tests'
+3. install pre-commit hooks `poetry run pre-commit install`
+4. run all mypy and style checks `poetry run pre-commit run --all-files`
+5. run tests `make run-tests`
+
+If nothing failed you're good to go ;)
