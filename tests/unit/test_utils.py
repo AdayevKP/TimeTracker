@@ -16,11 +16,14 @@ def test_date_bounds():
 def test_all_dates_in_scale():
     res = time_intervals.get_all_dates_in_scale(scale="week")
     assert res == [
-        "2024-02-19",
-        "2024-02-20",
-        "2024-02-21",
-        "2024-02-22",
-        "2024-02-23",
-        "2024-02-24",
-        "2024-02-25",
+        parser.parse(d).date()
+        for d in [
+            "2024-02-19",
+            "2024-02-20",
+            "2024-02-21",
+            "2024-02-22",
+            "2024-02-23",
+            "2024-02-24",
+            "2024-02-25",
+        ]
     ]
