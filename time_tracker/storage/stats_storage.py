@@ -77,6 +77,7 @@ class StatsStorage(common.SAStorage):
             )
             .filter(tbl.TimeEntry.end_time.is_not(None))
             .group_by(tbl.TimeEntry.project_id)
+            .order_by(tbl.TimeEntry.project_id)
         )
 
         async with self.session_factory() as session:
