@@ -1,7 +1,7 @@
-import httpx
+from fastapi import testclient
 
 
-async def test_base(client: httpx.AsyncClient) -> None:
-    response = await client.get("/")
+def test_base(client: testclient.TestClient) -> None:
+    response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello Time Tracker!"}

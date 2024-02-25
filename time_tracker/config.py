@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     PG_DB_USER: str
     PG_DB_PASSWORD: str
     PG_DB_PORT: str
+    PG_DB_HOST: str
 
     model_config = SettingsConfigDict(env_file="./.env")
 
