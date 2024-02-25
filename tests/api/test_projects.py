@@ -1,25 +1,23 @@
 # mypy: ignore-errors
-import httpx
+from fastapi import testclient
 import pytest
 import sqlalchemy
+from sqlalchemy import orm
 
 from time_tracker.db import models
 
 
 @pytest.fixture(scope="function")
-async def fill_db(async_session, reset_primary_key):
-    async_session.add(models.Project(name="work", description=None))
-    async_session.add(
-        models.Project(name="study", description="learning math")
-    )
-    await async_session.commit()
+def fill_db(session: orm.Session):
+    session.add(models.Project(name="work", description=None))
+    session.add(models.Project(name="study", description="learning math"))
+    session.commit()
     yield
-    await reset_primary_key("projects", "id")
 
 
 @pytest.mark.usefixtures("fill_db")
-async def test_projects_list(client: httpx.AsyncClient):
-    response = await client.get("/projects/")
+def test_projects_list(client: testclient.TestClient):
+    response = client.get("/projects/")
     assert response.status_code == 200
     assert response.json() == [
         {"name": "work", "id": 1, "description": None},
@@ -28,8 +26,8 @@ async def test_projects_list(client: httpx.AsyncClient):
 
 
 @pytest.mark.usefixtures("fill_db")
-async def test_add_project(client: httpx.AsyncClient, async_session):
-    response = await client.post(
+def test_add_project(client: testclient.TestClient, session: orm.Session):
+    response = client.post(
         "/projects/",
         json={"name": "MEGA PROJECT", "description": "mega description"},
     )
@@ -40,7 +38,7 @@ async def test_add_project(client: httpx.AsyncClient, async_session):
         "description": "mega description",
     }
 
-    db_proj = await async_session.execute(
+    db_proj = session.execute(
         sqlalchemy.text("Select * from projects where id = 3")
     )
     proj = db_proj.mappings().first()
@@ -62,15 +60,15 @@ async def test_add_project(client: httpx.AsyncClient, async_session):
         ("2", {"name": "study", "id": 2, "description": "learning math"}),
     ],
 )
-async def test_get_project(client: httpx.AsyncClient, proj_id, expected):
-    response = await client.get(f"/projects/{proj_id}")
+def test_get_project(client: testclient.TestClient, proj_id, expected):
+    response = client.get(f"/projects/{proj_id}")
     assert response.status_code == 200
     assert response.json() == expected
 
 
 @pytest.mark.usefixtures("fill_db")
-async def test_update_project(client: httpx.AsyncClient):
-    response = await client.put(
+def test_update_project(client: testclient.TestClient):
+    response = client.put(
         "/projects/1", json={"name": "work", "description": "working hard"}
     )
     assert response.status_code == 200
@@ -83,13 +81,13 @@ async def test_update_project(client: httpx.AsyncClient):
 
 class TestErrors:
     @pytest.mark.usefixtures("fill_db")
-    async def test_get_fake_project(self, client: httpx.AsyncClient):
-        response = await client.get("/projects/521")
+    def test_get_fake_project(self, client: testclient.TestClient):
+        response = client.get("/projects/521")
         assert response.status_code == 404
 
     @pytest.mark.usefixtures("fill_db")
-    async def test_update_fake_project(self, client: httpx.AsyncClient):
-        response = await client.put(
+    def test_update_fake_project(self, client: testclient.TestClient):
+        response = client.put(
             "/projects/101",
             json={"name": "work", "description": "working hard"},
         )
